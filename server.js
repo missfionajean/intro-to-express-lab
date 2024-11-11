@@ -13,14 +13,14 @@ const validator = require("validator");
 // creating variable for port (for easier testing)
 const port = 3000;
 
-// collectibles object to be used in "/collectibles" path
+// collectibles array to be used in "/collectibles" path
 const collectibles = [
 	{ name: "shiny ball", price: 5.95 },
 	{ name: "autographed picture of a dog", price: 10 },
 	{ name: "vintage 1970s yogurt SOLD AS-IS", price: 0.99 },
 ];
 
-// setting shoes object for query paramter practice later
+// setting shoes array for query paramter practice later
 const shoes = [
 	{ name: "Birkenstocks", price: 50, type: "sandal" },
 	{ name: "Air Jordans", price: 500, type: "sneaker" },
@@ -82,6 +82,41 @@ app.get("/hello", (req, res) => {
 	res.send(
 		`Hello there, ${req.query.name}! I hear you are ${req.query.age} years old!`
 	);
+});
+
+// shoe route to access array of objects using query parameters
+app.get("/shoes", (req, res) => {
+	// calling variables defined in the
+	const minPrice = req.query.minPrice;
+	const maxPrice = req.query.maxPrice;
+	const shoeType = req.query.type;
+
+	// creating a new array to be populated based on filters
+	const list = [];
+
+	// forEach loop that adds filtered contents to list
+	if (minPrice || maxPrice || shoeType) {
+		shoes.forEach((item) => {
+			if (minPrice && item.price >= minPrice) {
+				list.push(item);
+			} else if (maxPrice && item.price <= maxPrice) {
+				list.push(item);
+			} else if (shoeType && item.type === shoeType) {
+				list.push(item);
+			}
+		});
+	} else {
+		shoes.forEach((item) => {
+			list.push(item);
+		});
+	}
+
+	// creates a readable format for the filtered info above
+	let pageText = `Shoes that match your search:<br><br>`;
+	list.forEach((item) => {
+		pageText += `${item.name} (${item.type}) cost $${item.price} USD.<br>`;
+	});
+	res.send(pageText);
 });
 
 // creates listener for HTTP requests (goes at bottom)
